@@ -50,11 +50,16 @@ async def roll_check(message, pool_size):
     else:
         target_num = 8
 
-    # Check for user karma - TODO
-    karma = 0
+    # Check for user karma
+    slug = f'user{message.author.id}'
+    if slug in cfg:
+        user_cfg = cfg[slug]
+        karma = user_cfg.get('karma')
+    else:
+        karma = 0
 
     # Make the check
-    result = Check(pool_size, target_num, karma=0)
+    result = Check(pool_size, target_num, karma)
 
     # Format the raw roll results
     result_str = ' + '.join(
@@ -64,11 +69,13 @@ async def roll_check(message, pool_size):
         result_str = result_str[:MAX_POOL_RESULT_LEN]
 
     # Format the rich embed reply
-    embed = discord.Embed(color=message.author.color)
-    embed.set_author(name=message.author.display_name, icon_url=message.author.avatar_url)
-    embed.add_field(name=f'{pool_size}d10 TN {target_num}', value=result_str, inline=True)
-    embed.add_field(name='Successes', value=f'**{result.successes}**', inline=True)
-    embed.add_field(name='Ones', value=f'**{result.ones}**', inline=True)
+    embed = (discord.Embed(color=message.author.color)
+        .set_author(name=message.author.display_name, icon_url=message.author.avatar_url)
+        .add_field(name=f'{pool_size}d10 TN {target_num}', value=result_str, inline=True)
+        .add_field(name='Successes', value=f'**{result.successes}**', inline=True)
+        .add_field(name='Ones', value=f'**{result.ones}**', inline=True))
+    if karma != 0:
+        embed.set_footer(text=f'karma {"+" if karma > 0 else ""}{karma}')
     await message.channel.send(embed=embed)
 
 

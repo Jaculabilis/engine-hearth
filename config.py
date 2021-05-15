@@ -9,6 +9,11 @@ class Config:
     def __init__(self, path):
         self.path = path
 
+    def __contains__(self, key):
+        with open(self.path) as f:
+            cfg = json.load(f)
+            return key in cfg
+
     def __getitem__(self, key):
         with open(self.path) as f:
             cfg = json.load(f)

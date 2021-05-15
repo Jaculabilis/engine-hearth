@@ -30,7 +30,7 @@ class Check:
             low = max(1, 1 - karma)
             hih = max(1, 1 + karma)
             step = (hih - low) / 9  # 9 steps between 1 and 10
-            self.weights = (low + (i * step) for i in range(9)) + (hih,)
+            self.weights = tuple((low + (i * step) for i in range(9))) + (hih,)
         else:
             self.weights = None
 
