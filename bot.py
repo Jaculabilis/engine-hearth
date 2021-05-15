@@ -2,7 +2,7 @@ from importlib import reload
 
 import discord
 
-from config import EnvConfig as cfg
+import config
 import processor
 
 
@@ -21,6 +21,7 @@ async def on_message(message):
         return
 
     if message.content == 'reload':
+        reload(config)
         reload(processor)
         await message.add_reaction('\u2705')  # white_check_mark
         return
@@ -29,7 +30,7 @@ async def on_message(message):
 
 
 def main():
-    secret = open(cfg['secret_file']).read()
+    secret = open(config.EnvConfig['secret_file']).read()
     client.run(secret)
 
 
