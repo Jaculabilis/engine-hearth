@@ -2,17 +2,21 @@
 Main message processing logic. This is located in its own submodule so
 it can be hotswapped with an updated version from disk.
 '''
+from importlib import reload
 import re
 
 import discord
 
-from config import EnvConfig as cfg
-from roll import Check
+import config
+reload(config)
+import roll
+reload(roll)
 
 
 MAX_POOL_SIZE = 100
 MAX_POOL_RESULT_LEN = 1000
 
+cfg = config.EnvConfig
 
 async def on_message(message):
     # Limit to one channel
@@ -24,6 +28,13 @@ async def on_message(message):
     if pool_match:
         pool_size = min(int(pool_match.group(1)), MAX_POOL_SIZE)
         await roll_check(message, pool_size)
+        return
+
+    # Also check for attribute shortcuts
+    attr_pool = await roll.parse_stats(message)
+    if attr_pool is not None:
+        await roll_check(message, attr_pool)
+        return
 
     # No other actions supported at this time
 
